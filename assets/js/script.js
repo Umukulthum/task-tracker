@@ -11,8 +11,18 @@ function generateTaskId() {
 // Todo: create a function to create a task card
 function createTaskCard(task) {
     const cardDiv = $('<div class="card my-3 draggable">');
-    const cardBodyDiv = $('<div class="card-body">');
 
+    let difference = dayjs(task.dueDate).diff(dayjs(), "day");
+
+    if (difference == 0 && [statuses[0], statuses[1]].includes(task.status)) { 
+        cardDiv.addClass("bg-warning");
+    }
+
+    if (difference < 0 && [statuses[0], statuses[1]].includes(task.status)) {
+        cardDiv.addClass("bg-danger");
+     }
+
+    const cardBodyDiv = $('<div class="card-body">');
     const taskTitleEl = $('<h5 class="card-header">');
     taskTitleEl.text(task.title);
 
@@ -68,6 +78,11 @@ function handleAddTask(event) {
     let taskTitle = $("input[name=taskTitle]").val();
     let taskDueDate = $("input[name=taskDueDate]").val();
     let taskDescription = $("textarea[name=taskDescription]").val();
+
+    if (!taskTitle && !taskDueDate){
+        alert("Please input values in the fields to add a task");
+        return;
+    }
 
     taskList.push({ id: nextId, title: taskTitle, description: taskDescription, dueDate: taskDueDate, status: statuses[0] });
     localStorage.setItem("tasks", JSON.stringify(taskList));
@@ -126,7 +141,7 @@ $(document).ready(function () {
     $("#formModal").on("submit", handleAddTask);
     $(".delete-btn").on("click", handleDeleteTask)
 
-    $(".draggable").draggable();
+    $(".draggable").draggable({ opacity: 0.8, zIndex: 100 });
     $(".droppable").droppable();
     $(".droppable").on("drop", handleDrop);
 
